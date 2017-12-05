@@ -92,8 +92,6 @@ def main(name):
         print('[+] head_row_record:{}'.format(head_row_record))
         print('[+] target_row_record :{}'.format(target_row_record))
 
-    
-
 
 if __name__ == '__main__':
     argvs = sys.argv
