@@ -73,21 +73,6 @@ def main(name):
 
     wsheet = worksheet_acquisition(0)
 
-
-    # JSONをロード
-    #json_path = "PCSU-timecard.json"
-    #scope = ["https://spreadsheets.google.com/feeds"]
-    #path = os.path.expanduser(json_path)
-    #f = open('doc_id.txt')
-    #doc_id = f.readline()
-
-    # credentialsを取得 and Sheetの情報を取得
-    #credentials = ServiceAccountCredentials.from_json_keyfile_name(path, scope)
-    #gclient = gspread.authorize(credentials)
-    #gfile = gclient.open_by_key(doc_id)
-    #wsheet  = gfile.get_worksheet(0) # シートのindexを任意で入力
-
-
     # Sheetから列情報をlistで取得
     name_col_record, name_col_len = get_col(wsheet,2)
 
@@ -106,6 +91,9 @@ def main(name):
     if debug == 1:
         print('[+] head_row_record:{}'.format(head_row_record))
         print('[+] target_row_record :{}'.format(target_row_record))
+
+    
+
 
 if __name__ == '__main__':
     argvs = sys.argv
