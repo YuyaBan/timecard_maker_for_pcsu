@@ -44,6 +44,14 @@ def main():
 	wsheet  = worksheet_acquisition(0) # シートのindexを任意で入力
 	records = wsheet.get_all_records() # head=1を指定すると便利
 
+	keys = list(records[0].keys())
+	key_len = len(keys)
+
+	for i in range(len(keys)):
+		del_u3000(keys,key_len)
+		if i != (key_len-1): print('{},'.format(keys[i]),end='',file=f)
+		if i == (key_len-1): print('{}'.format(keys[i]),file=f)
+
 	for record in records:
 		tmp = list(record.values())
 		length = len(tmp)
