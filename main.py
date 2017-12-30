@@ -75,15 +75,20 @@ def search_name_row(reader,name):
 		i += 1
 
 def time_get(reader,name_row,time_row,date_col):   # Mtg時間を取得
-	time=[]
+	time_tmp=[]
+	time =[]
 	for t in date_col:
-		if reader[name_row][t] == 1:	#
-			time.append(parse_time_normal(reader[time_row][date_col]))
-		elif reader[name_row][date_col] == 0:
-			time.append(['0:00','0:00','0'])
+		if reader[name_row][t] == '1':	#
+			print("start normal:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
+			time_tmp.append(parse_time_normal(reader[time_row][t]))
+		elif reader[name_row][t] == '0':
+			print("kesseki:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
+			time_tmp.append(['0:00','0:00','0'])
 		else:
-			parse_time_late_or_early(reader[time_row][date_col],reader[name_row][date_col])
-			time.append(['error','error','0'])
+			print("late_or_early:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
+			time_tmp.append(parse_time_late_or_early(reader[time_row][t],reader[name_row][t]))
+		print("t:{},time:{}".format(t,time_tmp))
+		time.append(time_tmp)
 	return time
 
 def parse_time_normal(data):	# 通常出席（1）の場合
@@ -93,13 +98,14 @@ def parse_time_normal(data):	# 通常出席（1）の場合
 	if index_kyu == -1:
 		print('[-] not include 休')
 		quit()
-	time.append(time_record[0:index_kyu-6])
-	time.append(time_record[index_kyu-5:index_kyu])
-	index_h = time_record.find('h')
+	time.append(data[0:index_kyu-6])
+	time.append(data[index_kyu-5:index_kyu])
+	index_h = data.find('h')
 	if index_h == -1 or index_h < index_kyu:
 		print('[-] not include h or reverse')
 		quit()
-	time[2] = str(time_record[index_kyu+2:index_h])
+	time.append(str(data[index_kyu+2:index_h]))
+	print(time[2])
 	return time
 
 def parse_time_late_or_early(data,user_data):		# 遅刻or出席の場合
@@ -108,45 +114,27 @@ def parse_time_late_or_early(data,user_data):		# 遅刻or出席の場合
 	index_kyu = user_data.find('休')
 	index_h = user_data.find('h')
 	time = parse_time_normal(data)
-	if user_data[index_colon+1:].find(':') : # oo:oo~oo:ooパターン[oo:oo~oo:oo(休oh)]
-		time[0] = user_data[index_colon-1:index_wave]
+	if user_data.count(':') > 1 : # oo:oo~oo:ooパターン[oo:oo~oo:oo(休oh)]
+		print(111)
+		time[0] = user_data[index_colon-2:index_wave]
 		time[1] = user_data[index_wave+2:index_wave+6]
 		time[2] = str(user_data[index_kyu+2:index_h])
 	elif index_colon < index_wave : # 遅刻パターン[oo:oo~ (休oh)]
-		time[0] = user_data[index_colon-1:index_wave]
+		print(222)
+		time[0] = user_data[index_colon-2:index_wave]
 		if index_kyu > 0:
 			time[2] = str(user_data[index_kyu+2:index_h])
 	elif index_wave < index_colon : # 早退パターン[~oo:oo (休oh)]
+		print(333)
 		time[1] = user_data[index_wave+2:index_wave+6]
 		if index_kyu > 0:
 			time[2] = str(user_data[index_kyu+2:index_h])
 	else: # 不明パターン[]
+		print(4445)
 		time[0] = 'error'
 		time[1] = 'error'
 		time[2] = '0'
 	return time
-
-'''
-	if user_data.count('早'):					# 早退パターン
-		time[1] = user_data[index_colon-2:index_colon+2]
-		if index_kyu > 0:
-			time[2] = str(user_data[index_kyu+2:index_h])
-	elif 5 < index_kyu-index_wave:			# oo:oo~oo:ooパターン
-		time[0] = user_data[index_colon-5:index_wave]
-		time[1] = user_data[index_wave+1:index_wave+6]
-		time[2] = str(user_data[index_kyu+2:index_h])
-	elif index_wave < index_kyu:			# 遅刻パターン
-		time[0] = user_data[index_wave-5:index_wave]
-		if index_kyu > 0:
-			time[2] = str(user_data[index_kyu+2:index_h])
-	elif index_wave > 0 and index_kyu == -1:# 遅刻 and 休憩不記載パターン
-		time[0] = user_data[index_wave-5:index_wave]
-	else:									# 不明パターン
-		time[0] = 'error'
-		time[1] = 'error'
-		time[2] = '0'
-	return time
-'''
 
 def main(argvs):
 
@@ -188,13 +176,13 @@ def main(argvs):
 	date_col = search_date_col(header,date)
 	if debug == 1:
 		print('[*] Mtg:{}'.format(date_col))
+		print('{},{},{},{}'.format(header[date_col[0]],header[date_col[1]],header[date_col[2]],header[date_col[3]]))
 
 #### 3.各日の開始時間、終了時間、休憩時間を取得
 ## 時間の列を取得
 	time_row = get_time_row(reader[name_row:]) + name_row
-	if debug == 1:
+	if debug == 2:
 		print('[*] time_row:{}'.format(reader[time_row]))
-		print('[*] {}'.format(reader[time_row][date_col[0]]))
 	time = time_get(reader,name_row,time_row,date_col)
 
 	if debug == 1:
