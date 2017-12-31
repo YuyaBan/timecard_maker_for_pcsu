@@ -80,15 +80,15 @@ def time_get(reader,name_row,time_row,date_col):   # Mtg時間を取得
 	for t in date_col:
 		if reader[name_row][t] == '1':	#
 			print("start normal:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
-			time_tmp.append(parse_time_normal(reader[time_row][t]))
+			time.append(parse_time_normal(reader[time_row][t]))
 		elif reader[name_row][t] == '0':
 			print("kesseki:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
-			time_tmp.append(['0:00','0:00','0'])
+			time.append(['0:00','0:00','0'])
 		else:
 			print("late_or_early:{},user:{}".format(reader[time_row][t],reader[name_row][t]))
-			time_tmp.append(parse_time_late_or_early(reader[time_row][t],reader[name_row][t]))
-		print("t:{},time:{}".format(t,time_tmp))
-		time.append(time_tmp)
+			time.append(parse_time_late_or_early(reader[time_row][t],reader[name_row][t]))
+		print("t:{},time:{}".format(t,time))
+		#time.append(time_tmp)
 	return time
 
 def parse_time_normal(data):	# 通常出席（1）の場合
@@ -111,9 +111,14 @@ def parse_time_normal(data):	# 通常出席（1）の場合
 def parse_time_late_or_early(data,user_data):		# 遅刻or出席の場合
 	index_colon = user_data.find(':')
 	index_wave = user_data.find('~')
+	if index_wave < 0:
+		index_wave = user_data.find('〜')
+	if index_wave < 0:
+		index_wave = user_data.find('～')
 	index_kyu = user_data.find('休')
 	index_h = user_data.find('h')
 	time = parse_time_normal(data)
+	print("kyu:{},col:{},wave:{}".format(index_kyu,index_colon,index_wave))
 	if user_data.count(':') > 1 : # oo:oo~oo:ooパターン[oo:oo~oo:oo(休oh)]
 		print(111)
 		time[0] = user_data[index_colon-2:index_wave]
@@ -186,9 +191,7 @@ def main(argvs):
 	time = time_get(reader,name_row,time_row,date_col)
 
 	if debug == 1:
-		print('[*] st:{}'.format(time[0]))
-		print('[*] en:{}'.format(time[1]))
-		print('[*] rest:{}'.format(time[2]))
+		print('[*] st:{}'.format(time))
 
 if __name__ == '__main__':
 	argvs = sys.argv
