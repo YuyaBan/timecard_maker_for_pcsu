@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 # python main.py <name> <date>
+# date = %Y/%M/16
 import sys
 import csv, datetime
 from dateutil.relativedelta import relativedelta
@@ -36,19 +37,19 @@ def get_date_list(date):
 	Mtg.append(Mtg[1] + datetime.timedelta(days=7))
 
 	nextMtg = Mtg[2] + datetime.timedelta(days=7)
-	if nextMtg < next_mounth:
+	if nextMtg <= next_mounth:
 		Mtg.append(nextMtg)
 	else:
 		return Mtg
 
 	nextMtg = Mtg[3] + datetime.timedelta(days=7)
-	if nextMtg < next_mounth:
+	if nextMtg <= next_mounth:
 		Mtg.append(nextMtg)
 	else:
 		return Mtg
 
 	nextMtg = Mtg[4] + datetime.timedelta(days=7)
-	if nextMtg < next_mounth:
+	if nextMtg <= next_mounth:
 		Mtg.append(nextMtg)
 
 	return Mtg
@@ -58,7 +59,7 @@ def search_date_col(header,date):
 	#if debug == 1: print('[*] date_list:{}'.format(date_list))
 	date_col =[]
 	for d in date_list:
-		tmp = d.strftime('%-m/%-d')
+		tmp = d.strftime('%-m/%-d') + ' '
 		for h in range(len(header)):
 			if header[h].count(tmp):
 				date_col.append(h)
@@ -164,7 +165,7 @@ def main(argvs):
 	f = open('database.csv', 'r')
 
 	read = csv.reader(f)			# reader is list(csv_data)
-	head = next(read)			# header is list(header)
+	head = next(read)				# header is list(header)
 
 	for row in read:
 		reader.append(row)
